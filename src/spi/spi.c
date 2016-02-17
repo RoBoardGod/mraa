@@ -3,6 +3,8 @@
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014, 2015 Intel Corporation.
  *
+ * 2016/02 Modified by CJ Wu <sayter@dmp.com.tw>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -131,6 +133,10 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
         syslog(LOG_CRIT, "spi: Failed to allocate memory for context");
         return NULL;
     }
+	
+	if (IS_FUNC_DEFINED(dev, spi_init_raw_replace)) {
+        return dev->advance_func->spi_init_raw_replace(dev);
+    }
 
     char path[MAX_SIZE];
     sprintf(path, "/dev/spidev%u.%u", bus, cs);
@@ -170,6 +176,10 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
 mraa_result_t
 mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
 {
+	if (IS_FUNC_DEFINED(dev, spi_mode_replace)) {
+        return dev->advance_func->spi_mode_replace(dev, mode);
+    }
+	
     uint8_t spi_mode = 0;
     switch (mode) {
         case MRAA_SPI_MODE0:
@@ -201,6 +211,10 @@ mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
 mraa_result_t
 mraa_spi_frequency(mraa_spi_context dev, int hz)
 {
+	if (IS_FUNC_DEFINED(dev, spi_frequency_replace)) {
+        return dev->advance_func->spi_frequency_replace(dev, hz);
+    }
+	
     int speed = 0;
     dev->clock = hz;
     if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) {
@@ -235,6 +249,9 @@ mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb)
 mraa_result_t
 mraa_spi_bit_per_word(mraa_spi_context dev, unsigned int bits)
 {
+	if (IS_FUNC_DEFINED(dev, spi_bit_per_word_replace)) {
+        return dev->advance_func->spi_bit_per_word_replace(dev, bits);
+    }
     if (ioctl(dev->devfd, SPI_IOC_WR_BITS_PER_WORD, &bits) < 0) {
         syslog(LOG_ERR, "spi: Failed to set bit per word");
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -246,6 +263,10 @@ mraa_spi_bit_per_word(mraa_spi_context dev, unsigned int bits)
 int
 mraa_spi_write(mraa_spi_context dev, uint8_t data)
 {
+	if (IS_FUNC_DEFINED(dev, spi_write_replace)) {
+        return dev->advance_func->spi_write_replace(dev, data);
+    }
+	
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -268,6 +289,10 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
 uint16_t
 mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
 {
+	if (IS_FUNC_DEFINED(dev, spi_write_word_replace)) {
+        return dev->advance_func->spi_write_word_replace(dev, data);
+    }
+	
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -290,6 +315,10 @@ mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
 mraa_result_t
 mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length)
 {
+	if (IS_FUNC_DEFINED(dev, spi_transfer_buf_replace)) {
+        return dev->advance_func->spi_transfer_buf_replace(dev, data, rxbuf, length);
+    }
+	
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -309,6 +338,10 @@ mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int l
 mraa_result_t
 mraa_spi_transfer_buf_word(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length)
 {
+	if (IS_FUNC_DEFINED(dev, spi_transfer_buf_word_replace)) {
+        return dev->advance_func->spi_transfer_buf_word_replace(dev, data, rxbuf, length);
+    }
+	
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 

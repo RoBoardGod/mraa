@@ -2,6 +2,8 @@
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
+ * 2016/02 Modified by CJ Wu <sayter@dmp.com.tw>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -75,15 +77,28 @@ typedef struct {
     mraa_result_t (*aio_get_valid_fp) (mraa_aio_context dev);
     mraa_result_t (*aio_init_pre) (unsigned int aio);
     mraa_result_t (*aio_init_post) (mraa_aio_context dev);
+	unsigned int (*aio_read_replace) (mraa_aio_context dev);
 
     mraa_pwm_context (*pwm_init_replace) (int pin);
     mraa_result_t (*pwm_init_pre) (int pin);
     mraa_result_t (*pwm_init_post) (mraa_pwm_context pwm);
     mraa_result_t (*pwm_period_replace) (mraa_pwm_context dev, int period);
+	mraa_result_t (*pwm_duty_replace) (mraa_pwm_context dev, int duty);
+	int (*pwm_read_period_replace) (mraa_pwm_context dev);
+	int (*pwm_read_duty_replace) (mraa_pwm_context dev);
+	mraa_result_t (*pwm_enable_replace) (mraa_pwm_context dev, int enable);
 
     mraa_result_t (*spi_init_pre) (int bus);
     mraa_result_t (*spi_init_post) (mraa_spi_context spi);
+	mraa_spi_context (*spi_init_raw_replace) (mraa_spi_context dev);
     mraa_result_t (*spi_lsbmode_replace) (mraa_spi_context dev, mraa_boolean_t lsb);
+	mraa_result_t (*spi_mode_replace) (mraa_spi_context dev, mraa_spi_mode_t mode);
+	mraa_result_t (*spi_frequency_replace) (mraa_spi_context dev, int hz);
+	mraa_result_t (*spi_bit_per_word_replace) (mraa_spi_context dev, unsigned int bits);
+	int (*spi_write_replace) (mraa_spi_context dev, uint8_t data);
+	uint16_t (*spi_write_word_replace) (mraa_spi_context dev, uint16_t data);
+	mraa_result_t (*spi_transfer_buf_replace) (mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length);
+	mraa_result_t (*spi_transfer_buf_word_replace) (mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length);
 
     mraa_result_t (*uart_init_pre) (int index);
     mraa_result_t (*uart_init_post) (mraa_uart_context uart);

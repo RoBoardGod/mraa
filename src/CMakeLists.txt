@@ -2,6 +2,7 @@ set (mraa_LIB_INCLUDE_DIRS
   ${PROJECT_SOURCE_DIR}/api
   ${PROJECT_SOURCE_DIR}/api/mraa
   ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/include/86DuinoSDK
 )
 
 include_directories(
@@ -28,6 +29,13 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/intel_nuc5.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_minnow_byt_compatible.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_sofia_3gr.c
+  ${PROJECT_SOURCE_DIR}/src/x86/dmp_86duino_one.cpp
+)
+
+set (86DUINO_SDK_PATH ${PROJECT_SOURCE_DIR}/86DuinoSDK)
+
+set (mraa_86DUINO_SRC_NOAUTO
+  ${86DUINO_SDK_PATH}/src/Print.cpp
 )
 
 message (INFO " - Adding support for platform ${MRAAPLATFORMFORCE}")
@@ -49,6 +57,8 @@ if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_nuc5.c)
   elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_SOFIA_3GR")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_sofia_3gr.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_DMP_86DUINO_ONE")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/dmp_86duino_one.c)
   else ()
     message (ERROR " - Unknown x86 platform enabled!")
   endif ()
@@ -111,8 +121,16 @@ set (mraa_LIB_GLOB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/mraa.hpp
 )
 
-add_library (mraa ${mraa_LIB_SRCS})
+set (mraa_LIBS
+  ${mraa_LIBS}
+  ${86DUINO_SDK_PATH}/lib/libcore.a
+  ${86DUINO_SDK_PATH}/lib/libWire.a
+  ${86DUINO_SDK_PATH}/lib/libSPI.a
+  ${86DUINO_SDK_PATH}/lib/libTimerOne.a
+  rt
+)
 
+add_library (mraa ${mraa_LIB_SRCS})
 
 target_link_libraries (mraa ${mraa_LIBS})
 

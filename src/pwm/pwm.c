@@ -3,6 +3,8 @@
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014, 2015 Intel Corporation.
  *
+ * 2016/02 Modified by CJ Wu <sayter@dmp.com.tw>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -80,6 +82,13 @@ mraa_pwm_write_period(mraa_pwm_context dev, int period)
 static mraa_result_t
 mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
 {
+	if (IS_FUNC_DEFINED(dev, pwm_duty_replace)) {
+        mraa_result_t result = dev->advance_func->pwm_duty_replace(dev, duty);
+        if (result == MRAA_SUCCESS) {
+            dev->duty = duty;
+        }
+        return result;
+    }
     if (dev->duty_fp == -1) {
         if (mraa_pwm_setup_duty_fp(dev) == 1) {
             return MRAA_ERROR_INVALID_HANDLE;
@@ -95,6 +104,9 @@ mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
 static int
 mraa_pwm_read_period(mraa_pwm_context dev)
 {
+	if (IS_FUNC_DEFINED(dev, pwm_read_period_replace)) {
+        return dev->advance_func->pwm_read_period_replace(dev);
+    }
     char bu[MAX_SIZE];
     char output[MAX_SIZE];
     snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
@@ -131,6 +143,9 @@ mraa_pwm_read_period(mraa_pwm_context dev)
 static int
 mraa_pwm_read_duty(mraa_pwm_context dev)
 {
+	if (IS_FUNC_DEFINED(dev, pwm_read_duty_replace)) {
+        return dev->advance_func->pwm_read_duty_replace(dev);
+    }
     if (dev->duty_fp == -1) {
         if (mraa_pwm_setup_duty_fp(dev) == 1) {
             return MRAA_ERROR_INVALID_HANDLE;
@@ -192,7 +207,11 @@ mraa_pwm_init(int pin)
     }
 
     if (plat->adv_func->pwm_init_replace != NULL) {
-        return plat->adv_func->pwm_init_replace(pin);
+        mraa_pwm_context pret = plat->adv_func->pwm_init_replace(pin);
+		if(pret == NULL)
+			return NULL;
+		pret->advance_func = plat->adv_func;
+		return pret;
     }
     if (plat->adv_func->pwm_init_pre != NULL) {
         if (plat->adv_func->pwm_init_pre(pin) != MRAA_SUCCESS)
@@ -350,6 +369,9 @@ mraa_pwm_pulsewidth_us(mraa_pwm_context dev, int us)
 mraa_result_t
 mraa_pwm_enable(mraa_pwm_context dev, int enable)
 {
+	if (IS_FUNC_DEFINED(dev, pwm_enable_replace)) {
+        return dev->advance_func->pwm_enable_replace(dev, enable);
+    }
     int status;
     if (enable != 0) {
         status = 1;

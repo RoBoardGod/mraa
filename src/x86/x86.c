@@ -2,6 +2,8 @@
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
+ * 2016/02 Modified by CJ Wu <sayter@dmp.com.tw>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -34,6 +36,7 @@
 #include "x86/intel_nuc5.h"
 #include "x86/intel_minnow_byt_compatible.h"
 #include "x86/intel_sofia_3gr.h"
+#include "x86/dmp_86duino_one.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -92,10 +95,22 @@ mraa_x86_platform()
                     platform_type = MRAA_INTEL_SOFIA_3GR;
                     plat = mraa_intel_sofia_3gr();
                 }
-                free(line);
             }
-            fclose(fh);
+			fclose(fh);
         }
+		if (platform_type == MRAA_UNKNOWN_PLATFORM) {
+			fh = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
+			if (fh != NULL) {
+				if (getline(&line, &len, fh) != -1) {
+					if (strncmp(line, "Vortex86EX", 10) == 0) {
+						platform_type = MRAA_DMP_86DUINO_ONE;
+						plat = mraa_dmp_86duino_one();
+					}
+				}
+			}
+			fclose(fh);
+		}
+		free(line);
     }
     return platform_type;
 #else
@@ -113,6 +128,8 @@ mraa_x86_platform()
     plat = mraa_intel_nuc5();
     #elif defined(xMRAA_INTEL_SOFIA_3GR)
     plat = mraa_intel_sofia_3gr();
+	#elif defined(xMRAA_DMP_86DUINO_ONE)
+	plat = mraa_dmp_86duino_one();
     #else
         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
     #endif

@@ -2,6 +2,8 @@
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright © 2014 Intel Corporation
  *
+ * 2016/02 Modified by CJ Wu <sayter@dmp.com.tw>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
@@ -49,6 +51,7 @@ typedef enum {
     MRAA_96BOARDS = 9,            /**< Linaro 96boards */
     MRAA_INTEL_SOFIA_3GR = 10,      /**< The Intel SoFIA 3GR */
 
+	MRAA_DMP_86DUINO_ONE = 86,
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 

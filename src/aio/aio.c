@@ -3,6 +3,8 @@
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014, 2015 Intel Corporation.
  *
+ * 2016/02 Modified by CJ Wu <sayter@dmp.com.tw>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -137,6 +139,10 @@ mraa_aio_init(unsigned int aio)
 unsigned int
 mraa_aio_read(mraa_aio_context dev)
 {
+	if (IS_FUNC_DEFINED(dev, aio_read_replace)) {
+        return dev->advance_func->aio_read_replace(dev);
+    }
+	
     char buffer[17];
     unsigned int shifter_value = 0;
 

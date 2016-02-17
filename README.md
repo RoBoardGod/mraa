@@ -23,6 +23,9 @@ X86
 * [Intel DE3815](../master/docs/intel_de3815.md)
 * [Minnowboard Max](../master/docs/minnow_max.md)
 * [NUC 5th generation](../master/docs/intel_nuc5.md)
+* [DMP 86Duino One](http://www.86duino.com/index.php?p=9879)
+* [DMP 86Duino Zero](http://www.86duino.com/index.php?p=10040&lang=TW)
+* [DMP 86Duino EduCake](http://www.86duino.com/index.php?p=9600)
 
 ARM
 ---

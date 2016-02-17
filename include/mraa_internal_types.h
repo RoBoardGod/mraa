@@ -3,6 +3,8 @@
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
+ * 2016/02 Modified by CJ Wu <sayter@dmp.com.tw>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -100,6 +102,8 @@ struct _pwm {
     int chipid; /**< the chip id, which the pwm resides */
     int duty_fp; /**< File pointer to duty file */
     int period;  /**< Cache the period to speed up setting duty */
+	int enable;
+	int duty;
     mraa_boolean_t owner; /**< Owner of pwm context*/
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
