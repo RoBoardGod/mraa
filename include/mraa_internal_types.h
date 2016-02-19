@@ -54,6 +54,7 @@ struct _gpio {
     void *isr_args; /**< args return when interupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
+	mraa_gpio_mode_t mode;
 #ifndef HAVE_PTHREAD_CANCEL
     int isr_control_pipe[2]; /**< a pipe used to interrupt the isr from polling the value fd*/
 #endif

@@ -39,7 +39,7 @@ static speed_t
 uint2speed(unsigned int speed)
 {
     switch (speed) {
-        case 0:
+        /*case 0:
             return B0; // hangup, not too useful otherwise
         case 50:
             return B50;
@@ -50,15 +50,15 @@ uint2speed(unsigned int speed)
         case 150:
             return B150;
         case 200:
-            return B200;
+            return B200;*/
         case 300:
             return B300;
-        case 600:
-            return B600;
+        /*case 600:
+            return B600;*/
         case 1200:
             return B1200;
-        case 1800:
-            return B1800;
+        /*case 1800:
+            return B1800;*/
         case 2400:
             return B2400;
         case 4800:
@@ -67,13 +67,13 @@ uint2speed(unsigned int speed)
             return B9600;
         case 19200:
             return B19200;
-        case 38400:
-            return B38400;
+       /* case 38400:
+            return B38400;*/
         case 57600:
             return B57600;
         case 115200:
             return B115200;
-        case 230400:
+        /*case 230400:
             return B230400;
         case 460800:
             return B460800;
@@ -98,7 +98,7 @@ uint2speed(unsigned int speed)
         case 3500000:
             return B3500000;
         case 4000000:
-            return B4000000;
+            return B4000000;*/
         default:
             // if we are here, then an unsupported baudrate was selected.
             // Report it via syslog and return B9600, a common default.
@@ -461,6 +461,24 @@ mraa_uart_get_dev_path(mraa_uart_context dev)
     return dev->path;
 }
 
+char
+mraa_uart_read_byte(mraa_uart_context dev)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: read: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (dev->fd < 0) {
+        syslog(LOG_ERR, "uart: port is not open");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    char ch;
+    read(dev->fd, &ch, 1);
+    return ch;
+}
+
 int
 mraa_uart_read(mraa_uart_context dev, char* buf, size_t len)
 {
@@ -474,7 +492,11 @@ mraa_uart_read(mraa_uart_context dev, char* buf, size_t len)
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    return read(dev->fd, buf, len);
+    int i;
+    for (i = 0; i < len; i++)
+        buf[i] = mraa_uart_read_byte(dev);
+
+    return len;
 }
 
 int

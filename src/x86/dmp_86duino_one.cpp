@@ -74,6 +74,29 @@ mraa_dmp_86duino_one_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
 }
 
 mraa_result_t
+mraa_dmp_86duino_one_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
+{
+	switch (mode)
+	{
+		case MRAA_GPIO_STRONG:
+			dev->mode = MRAA_GPIO_STRONG;
+            break;
+        case MRAA_GPIO_PULLUP:
+			dev->mode = MRAA_GPIO_PULLUP;
+            break;
+        case MRAA_GPIO_PULLDOWN:
+			dev->mode = MRAA_GPIO_PULLDOWN;
+            break;
+        case MRAA_GPIO_HIZ:
+			dev->mode = MRAA_GPIO_HIZ;
+            break;
+        default:
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+	}
+	return MRAA_SUCCESS;
+}
+
+mraa_result_t
 mraa_dmp_86duino_one_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
 	int pin = dev->pin;
@@ -83,7 +106,12 @@ mraa_dmp_86duino_one_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir
 			pinMode(pin, OUTPUT);
 			break;
 		case MRAA_GPIO_IN:
-			pinMode(pin, INPUT);
+			if (dev->mode == MRAA_GPIO_PULLUP)
+				pinMode(pin, INPUT_PULLUP);
+			else if (dev->mode == MRAA_GPIO_PULLDOWN)
+				pinMode(pin, INPUT_PULLDOWN);
+			else
+				pinMode(pin, INPUT);
 			break;
 		case MRAA_GPIO_OUT_HIGH:
 			pinMode(pin, OUTPUT);
@@ -110,6 +138,12 @@ mraa_dmp_86duino_one_gpio_write_replace(mraa_gpio_context dev, int value)
 {
 	digitalWrite(dev->pin, value);
 	return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_dmp_86duino_one_gpio_edge_mode_replace(mraa_gpio_context dev, mraa_gpio_edge_t mode)
+{
+	return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
 mraa_result_t
@@ -404,8 +438,12 @@ mraa_dmp_86duino_one_spi_frequency_replace(mraa_spi_context dev, int hz)
 mraa_result_t
 mraa_dmp_86duino_one_spi_bit_per_word_replace(mraa_spi_context dev, unsigned int bits)
 {
-	dev->bpw = bits;
-	return MRAA_SUCCESS;
+	if (bits == 8 || bits == 16)
+	{
+		dev->bpw = bits;
+		return MRAA_SUCCESS;
+	}
+	return MRAA_ERROR_INVALID_PARAMETER;
 }
 
 int
@@ -475,9 +513,11 @@ mraa_dmp_86duino_one()
         goto error;
     }
 	b->adv_func->gpio_init_internal_replace = &mraa_dmp_86duino_one_gpio_init_internal_replace;
+	b->adv_func->gpio_mode_replace = &mraa_dmp_86duino_one_gpio_mode_replace;
 	b->adv_func->gpio_dir_replace = &mraa_dmp_86duino_one_gpio_dir_replace;
 	b->adv_func->gpio_read_replace = &mraa_dmp_86duino_one_gpio_read_replace;
 	b->adv_func->gpio_write_replace = &mraa_dmp_86duino_one_gpio_write_replace;
+	b->adv_func->gpio_edge_mode_replace = &mraa_dmp_86duino_one_gpio_edge_mode_replace;
 	b->adv_func->aio_get_valid_fp = &mraa_dmp_86duino_one_aio_get_valid_fp;
 	b->adv_func->aio_read_replace = &mraa_dmp_86duino_one_aio_read_replace;
 	b->adv_func->i2c_init_bus_replace = &mraa_dmp_86duino_one_i2c_init_bus_replace;
